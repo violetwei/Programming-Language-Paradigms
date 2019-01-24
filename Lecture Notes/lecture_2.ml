@@ -64,3 +64,17 @@ let rec badzip li l2 =
   if l1 = [] then l2
   else
     (List.hd li) :: badzip l2 (List.tl li)
+    
+(* equivalent function written with pattern matching *)    
+let rec badzip l1 l2 =
+  match l1 with
+  | [] -> l2
+  | x :: xs -> x :: badzip l2 xs    
+ 
+(* append two lists *) 
+let rec append l1 l2 =
+  match l1 with 
+  | [] -> l2
+  | x :: xs -> x :: (append xs l2) ;; 
+
+1 :: 2 :: [] ;; (* - : int list = [1; 2] *)  
