@@ -32,6 +32,8 @@ let rec mysqrt((x:float), (guess:float)) =
     else mysqrt(x, (guess +. x/.guess)/.2.0);;
     
 
+
+
 (* Q2: This is similar to the question above except that we are computing cube roots. 
    The formula to refine the guess is g′=(2.0⋅g+x/g^2)/3.0
    where I am using mathematical notation with arithmetic operation symbols overloaded. 
@@ -49,12 +51,46 @@ let cube_root (x:float) =
   
 
 (* Question 2 Cube root using Newton's method. Solution given by professor *)
-
 let cube(x:float) = x*. x*. x;;
 
 let rec cube_root((x:float), (guess:float)) =
   if close(cube(guess),x) then guess
   else cube_root(x, ((2.0 *. guess) +. x/.(square(guess)))/.3.0);;
   
+  
+  
+  
+(* In lecture 1 I quickly explained the Russian peasant algorithm for fast exponentiation. 
+   In this exercise you have to implement a tail-recursive version of the algorithm. 
+   Everything is with integers in this question so please do not use floating point operations.
+*)
+
+(* My solution to Q3 *)
+let fast_exp (base, power) = 
+  let rec helper (acc, p)=
+    if p=0 then 1
+    else if p=1 then acc
+    else if p mod 2 =0 then helper(int_of_float (square (float_of_int acc)), p/2)
+    else base * helper(int_of_float(square (float_of_int acc)), (p-1)/2)
+  in helper(base, power)
+  
+
+(* Question 3 Tail-recursive version of fast-exponentiation. Solution given by the professor *)
+let odd n = (n mod 2) = 1;;
+
+let fast_exp (base, power) =
+  let rec tail_fe (base, power, acc) =
+    if power = 0 then acc
+    else
+      if (odd power) then
+        tail_fe (base, power - 1, base * acc)
+      else
+        tail_fe (base * base, power / 2, acc)
+  in
+  if base = 0 then 0
+  else if power < 0 then failwith "Can't use negative powers"
+  else if power = 0 then 1
+  else
+    tail_fe (base, power, 1);;  
   
   
