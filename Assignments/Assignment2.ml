@@ -161,4 +161,27 @@ let find_max l =
   | (x::xs) -> helper(xs,x);;
 
    
-   
+(* Q4: use 'find_max' and 'remove' to implement a selection sort algorithm. 
+   You can assume that the list contains no duplicates.
+   # let rec selsort l = ...
+   val selsort : 'a list -> 'a list = <fun>
+   # selsort [1; 4; 2; 5; 3; 9; 6; 8; 7];;
+   - : int list = [9; 8; 7; 6; 5; 4; 3; 2; 1]
+   You are not allowed to use built-in sorting functions.   
+*)   
+
+(* My solution to Question 4 *)
+
+let rec selsort l =
+  match l with
+    [] -> []
+  | _ -> let m = find_max l in m :: (selsort(remove(m, l)))
+;;
+
+(* Question 4 solution given by prof. *)
+  
+let rec selsort l =
+  match l with
+  | [] -> []
+  | _ -> let m = (find_max l) in
+         m::(selsort(remove(m,l)));;
