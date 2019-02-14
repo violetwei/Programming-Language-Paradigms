@@ -1,9 +1,11 @@
 # Assignments
 
-A1: Iterative computation
+Assignment 1: Iterative computation
 
-A2: List manipulation
+Assignment 2: List manipulation
 
-A3: Mergesort
+Assignment 3: Mergesort
 
-A4: Trees and Calculus
+Assignment 4: Trees and Calculus
+
+Assignment 5: Colouring and Imperative Lists
