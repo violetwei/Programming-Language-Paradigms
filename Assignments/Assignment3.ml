@@ -69,3 +69,42 @@ let rec split l =
   | x::[] -> [x],[]
   | [] -> [],[]
 ;;
+
+(* Q3: you will implement the merge algorithm on ordered lists.
+
+   val merge : 'a list * 'a list -> 'a list = 
+   # let l3 = [1; 3; 5; 7; 9];;
+   val l3 : int list = [1; 3; 5; 7; 9]
+   # let l4 = [2; 4; 6; 8];;
+   val l4 : int list = [2; 4; 6; 8]
+   # merge (l3,l4);;
+   - : int list = [1; 2; 3; 4; 5; 6; 7; 8; 9]
+*)
+
+(* My solution to Question 3 *)
+
+let rec merge twolists =
+  match fst twolists, snd twolists with
+  | [], _ -> snd twolists
+  | _, [] -> fst twolists
+  | hx :: txs, hy :: tys ->
+      if hx < hy then hx :: merge (txs, snd twolists) else hy :: merge (fst twolists, tys)
+;;
+
+(* Q4: complete the mergesort algorithm. Here is the type and an example.
+
+   val mergesort : 'a list -> 'a list = 
+   # mergesort [10;2;8;5;1;4;3;9;7;6];;
+   - : int list = [1; 2; 3; 4; 5; 6; 7; 8; 9; 10]
+   # mergesort [1;3;2;4;1;2;5;3];;
+   - : int list = [1; 1; 2; 2; 3; 3; 4; 5]
+*)
+
+(* My solution to Question 4 *)
+
+let rec mergesort l = 
+  match l with
+  | ([] | _::[]) -> l
+  | _ -> let (pri,seg) = split l
+      in (merge ((mergesort pri), (mergesort seg))) 
+;;
