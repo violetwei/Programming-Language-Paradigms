@@ -72,3 +72,40 @@ let countriesInChart (cht: chart) =
 
 let colourTheCountries (cht : chart) =
   List.fold_left (fun col2 x -> extColouring cht col2 x) [] (countriesInChart cht) ;;
+  
+  
+(* Q1 solution given by prof. *)
+
+type country = string;;
+type chart = (country * country) list;;
+type colour = country list;;
+type colouring = colour list;;
+
+let areNeighbours ct1 ct2 (cht : chart) =
+   (List.mem (ct1,ct2) cht) || (List.mem (ct2,ct1) cht);;
+
+let canBeExtBy (col:colour) (ct: country) (ch : chart) =
+  List.for_all (fun c -> not (areNeighbours c ct ch)) col;;
+
+let rec extColouring (cht: chart) (colours : colouring) (cntry : country) =
+  match colours with
+  | [] -> [[cntry]]
+  | col :: rest -> 
+     if (canBeExtBy col cntry cht)
+    then
+      (cntry :: col) :: rest
+    else
+      col :: (extColouring cht rest cntry);;
+
+let rec removeDuplicates lst =
+  match lst with
+  | [] -> []
+  | x :: xs -> x :: (List.filter (fun u -> not (u = x)) (removeDuplicates xs));;
+
+let countriesInChart (cht: chart) =
+  removeDuplicates (List.fold_left (fun lst (c1,c2) -> c1:: (c2 :: lst)) [] cht);;
+
+let myWorld:chart = [("Andorra","Benin");("Andorra","Canada");("Andorra","Denmark");("Benin","Canada"); ("Benin","Denmark");("Canada","Denmark");("Estonia","Canada");("Estonia","Denmark");("Estonia","Finland");("Finland","Greece");("Finland","Benin");("Greece","Benin");("Greece","Denmark");("Greece","Estonia")];;
+
+let colourTheCountries (cht : chart) =
+  List.fold_left (extColouring cht) [[]] (countriesInChart cht);;
