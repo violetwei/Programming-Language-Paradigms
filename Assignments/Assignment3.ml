@@ -37,6 +37,20 @@ let rec common twolists =
         common (t, snd twolists)     
 ;; 
 
+(* Question 1 given by professor *)
+
+let rec common twolists =
+  match twolists with
+    | (l,[]) -> []
+    | ([],l) -> []
+    | ((x::xs),l) ->
+        if (List.mem x l)
+        then
+          x::(common(xs, (List.filter (fun u -> not(u = x)) l)))
+        else
+          common(xs,l);;
+          
+          
 (* The following three questions are about merge sort. 
    The mergesort algorithm is a recursive algorithm for sorting lists which runs in time O(nlogn). 
    The items in the list must have an order relation defined on them, otherwise sorting does not make sense of course.
@@ -70,6 +84,17 @@ let rec split l =
   | [] -> [],[]
 ;;
 
+(* Question 2 given by prof. *)
+
+let rec split l =
+  match l with
+  | [] -> ([],[])
+  | x :: [] -> (x::[],[])
+  | (x::y::l) ->
+  let (odds,evens) = split(l)
+  in
+      (x::odds,y::evens);;
+
 (* Q3: you will implement the merge algorithm on ordered lists.
 
    val merge : 'a list * 'a list -> 'a list = 
@@ -91,6 +116,19 @@ let rec merge twolists =
       if hx < hy then hx :: merge (txs, snd twolists) else hy :: merge (fst twolists, tys)
 ;;
 
+(* Question 3 given by prof. *)
+
+let rec merge twolists =
+  match twolists with
+  | ([],rt) -> rt
+  | (lft,[]) -> lft
+  | (x::xs, y::ys) ->
+    if (x < y)
+    then
+      x::merge(xs, y::ys)
+    else
+      y::merge(x::xs,ys);;
+
 (* Q4: complete the mergesort algorithm. Here is the type and an example.
 
    val mergesort : 'a list -> 'a list = 
@@ -108,3 +146,15 @@ let rec mergesort l =
   | _ -> let (pri,seg) = split l
       in (merge ((mergesort pri), (mergesort seg))) 
 ;;
+
+(* Question 4 given by prof. *)
+
+let rec mergesort l =
+  match l with
+  | [] -> []
+  | (n::[]) -> n::[] (* Without this you will go into an infinite loop. *)
+  | n::ns ->
+    let (m,n) = split(l) in
+      let m2 = mergesort(m) in
+      let n2 = mergesort(n) in
+      merge(m2,n2);;
