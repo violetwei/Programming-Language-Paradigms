@@ -62,6 +62,12 @@ let rec mapTree f (t: 'a tree) =
   | Node (l, m, r) -> Node(mapTree f l, f m, mapTree f r)
 ;;
 
+(* Question 1 given by prof. *)
+let rec mapTree f (t: 'a tree) =
+  match t with
+  | Empty -> Empty
+  | Node(l,v,r) -> Node((mapTree f l), (f v), (mapTree f r));;
+
 (* Q2: Suppose that f is a continuous function from the real numbers to the real numbers. 
        Suppose further that there is an interval [a,b] in which the function is known to have exactly one root 
        (a value r such that f(r) = 0). We will assume that f(a) < 0 and f(b) > 0 and the root r is somewhere in between. 
@@ -86,6 +92,24 @@ let rec halfint (f, (epsilon : float)) ((negValue : float), (posValue : float)) 
   else halfint(f,epsilon)(mid,posValue) 
 ;;
 
+(* Question 2 solution given by prof. *)
+
+(* Floating-point version of absolute value. *)
+let absFl(x:float) = if (x < 0.0) then -.x else x;;
+
+let rec halfint((f: float -> float),(posValue:float),(negValue:float),(epsilon:float)) =
+  let mid = (posValue +. negValue)/.2.0 in
+  if ((absFl(f mid)) < epsilon)
+  then
+    mid
+  else
+    if (f mid) < 0.0
+    then
+      halfint(f,posValue,mid,epsilon)
+    else
+    halfint(f,mid,negValue,epsilon);;
+    
+
 (* Q3: The Newton-Raphson method is a classic higher-order function in action. 
        The main point is that we can attempt to find a root of a function using the function and its derivative. 
        This is an important approach that could be - and is - used in rocket science.
@@ -105,6 +129,25 @@ let rec newton (f, (epsilon:float), (dx:float)) (guess:float) =
   else newton (f, epsilon, dx) (improve (guess))
 ;; 
 
+(* Question 3. *)
+let deriv((f: float -> float), (dx: float)) = fun (x:float) -> (((f (x +. dx)) -. (f x))/.dx);;
+
+let rec newton(f, (guess:float), (epsilon:float), (dx:float)) =
+  let close((x:float), (y:float), (epsilon:float)) = absFl(x-.y) < epsilon in
+  let improve((guess:float),f,(dx:float)) = guess -. (f guess)/.((deriv(f,dx)) guess) in
+  if close((f guess), 0.0, epsilon)
+  then
+    guess
+  else
+    newton(f,improve(guess,f,dx),epsilon,dx);;
+    
+(* For testing *)
+let make_cubic((a:float),(b:float),(c:float)) = fun x -> (x*.x*.x +. a *. x*.x +. b*.x +. c)
+let test1 = newton(make_cubic(2.0,-3.0,1.0),0.0,0.0001,0.0001)
+(* Should get -3.079599812; don't worry if your last couple of digits are off. *)
+let test2 = newton(sin,5.0,0.0001,0.0001)
+(* Should get 9.424.... *)
+
 (* Q4: Implement the function indIntegral (f, dx) : float -> float that returns another function, 
        which would compute an indefinite integral. The returned function should be equivalent to
        indIntegral(f,dx)=∫x0f(y)dy
@@ -116,3 +159,21 @@ let rec newton (f, (epsilon:float), (dx:float)) (guess:float) =
 let indIntegral (f, (dx:float)) =
   fun x -> integral (f, 0.0, x, dx)
 ;;
+
+(* Question 4 solution given by prof. *)
+(* The first two functions below should be preloaded into the environment. *)
+                  
+  let iterSum(f, (lo:float), (hi:float), inc) =
+    let rec helper((x:float), (result:float)) =
+      if (x > hi) then result
+      else helper((inc x), (f x) +. result)
+    in
+    helper(lo,0.0);;
+
+let integral((f: float -> float),(lo:float),(hi:float),(dx:float)) =
+  let delta (x:float) = x +. dx in
+  dx *. iterSum(f,(lo +. (dx/.2.0)), hi, delta);;
+
+(* This is all they have to write. *)
+
+let indIntegral(f,(dx:float)) = fun (x:float) -> integral(f,0.0,x,dx);;
