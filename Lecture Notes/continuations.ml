@@ -1,4 +1,4 @@
-(* Regular, non-tail recursive append *)
+(* Regular, non-tail recursive append - OCaml *)
 let rec append (l1 : 'a list) (l2 : 'a list) : 'a list =
   match l1 with
   | [] -> l2
