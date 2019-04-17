@@ -109,3 +109,46 @@ let myWorld:chart = [("Andorra","Benin");("Andorra","Canada");("Andorra","Denmar
 
 let colourTheCountries (cht : chart) =
   List.fold_left (extColouring cht) [[]] (countriesInChart cht);;
+  
+  
+(* Q2. Imperative linked lists
+This exercise shows you how to do low-level pointer manipulation in OCaml if you ever need to do that, using ref-based linked lists. 
+Implement the function insert : (int * int -> bool) -> int -> rlist -> unit which inserts an element into a sorted linked list and preserves the sorting. 
+You do not have to worry about checking if the input list is sorted; it will be sorted with respect to the comparison function given as the first argument. 
+Your function will destructively update the list. This means that you will have mutable fields that get updated.
+
+The program is short (5 lines or fewer) and easy to mess up. 
+Please think carefully about whether you are creating aliases or not. 
+You can easily write programs that look absolutely correct but which create infinite loops. 
+It might happen that your insert program looks like it is working correctly but then displayList crashes. 
+You might then waste hours trying to “fix” displayList and cursing us for writing incorrect code. 
+Most likely, your insert happily terminated but created a cycle of pointers which then sends displayList into an infinite loop.
+To help you, 3 of the tested argument sets will be constant.
+*)  
+
+type cell = { data : int; next : rlist}
+and rlist = cell option ref;;
+
+let c1 = {data = 1; next = ref None};;
+let c2 = {data = 2; next = ref (Some c1)};;
+let c3 = {data = 3; next = ref (Some c2)};;
+let c5 = {data = 5; next = ref (Some c3)};;
+
+(* This converts an RList to an ordinary list. *)
+let rec displayList (c : rlist) =
+  match !c with
+    | None -> []
+    | Some { data = d; next = l } -> d :: (displayList l);;
+
+let cell2rlist (c:cell):rlist = ref (Some c);;
+    
+let bigger((x:int), (y:int)) = (x > y);;
+
+let rec insert comp (item: int) (list: rlist) =
+  match !list with
+    | None -> 
+        list := Some { data = item ; next = ref None}
+    | Some { data = d } when comp (item, d) ->
+        let newCell = Some { data = item; next = ref (!list) } in list := newCell
+    | Some { next = tail } ->
+        insert comp item tail;;
