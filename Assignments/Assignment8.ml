@@ -128,5 +128,73 @@ val badex4 : string = "a+(b+"
 Exception: Invalid_argument "index out of bounds".
 # parse "a + b";;
 - : exptree = Var 'a'
+*)
 
- *)
+
+(* Q2. Code Generation
+
+In this question you will implement a toy code generator for the very simple stack machine as explained in class on March 13th. 
+Use the output from the parser as input to the code generator. The code generator should just print the "machine instructions". 
+
+Use statements like:
+
+Printf.printf "LOAD  %c\n" c
+Printf.printf "ADD  %c\n" c
+Printf.printf "MUL  %c\n" c
+Printf.printf "STORE %i\n" tempstore
+Printf.printf "ADD %i\n" tempstore
+
+within your program to get this effect.*)
+
+let tempstore = ref 0;;
+  
+type exptree = Var of char | Expr of char * exptree * exptree;;
+
+(* solution to q2. code generation *)
+let codegen (e: exptree) = 
+  let rec helper((e: exptree), (tag: char)) =
+    match e with
+      | Var c ->
+        if (tag = '=') then
+          Printf.printf "LOAD  %c\n" c
+        else
+          if (tag = '+')
+          then
+            Printf.printf "ADD  %c\n" c
+          else (* tag = '*' *)
+            Printf.printf "MUL  %c\n" c
+      | Expr(op,l,r) -> 
+         if (tag = '=') then
+           (helper (l,'=');
+           helper (r, op))
+         else
+           begin
+             tempstore := !tempstore + 1;
+             Printf.printf "STORE %i\n" !tempstore;
+             helper(l,'=');
+             helper(r,op);
+             (if (tag = '+')
+             then
+               Printf.printf "ADD %i\n" !tempstore
+             else
+               Printf.printf "MUL %i\n" !tempstore);
+             tempstore := !tempstore - 1
+           end
+  in
+  helper(e,'=');;
+
+(*
+         
+let exptree = Expr ('+',Var 'a',Expr ('*',Var 'b',Expr ('+',Var 'c',Var 'd')));;
+# codegen exptree;;
+LOAD  a
+STORE 1
+LOAD  b
+STORE 2
+LOAD  c
+ADD  d
+MUL 2
+ADD 1
+- : unit = ()
+
+*)
